@@ -37,6 +37,7 @@ class GetHexbinsForCbsa(object):
             parameterType='REQUIRED',
             enabled=True
         )
+#        param0.filter.type = 'Polygon'
         params = [param0, param1]
         return params
 
