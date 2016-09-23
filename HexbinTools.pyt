@@ -9,7 +9,7 @@ class HexbinTools(object):
         self.alias = "Hexbin Tools"
 
         # List of tool classes associated with this toolbox
-        self.tools = [Tool]
+        self.tools = [GetHexbinsForCbsa]
 
 
 class GetHexbinsForCbsa(object):
