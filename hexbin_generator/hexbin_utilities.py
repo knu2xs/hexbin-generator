@@ -120,17 +120,17 @@ def winsorize_value(X, quartile_values):
         return X
 
 
-def get_winsorized_list(X):
+def get_winsorized_list(value_list):
     """
     Winsorize the input list to remove outliers.
-    :param X: List of numeric values.
+    :param value_list: List of numeric values.
     :return: Winsorized list of values.
     """
     # get the upper and lower quartiles
-    quartile_values = get_lower_upper_quartile(X)
+    quartile_values = get_lower_upper_quartile(value_list)
 
     # create new list by windsorizing the values
-    return [winsorize_value(value, quartile_values) for value in X]
+    return [winsorize_value(value, quartile_values) for value in value_list]
 
 
 def get_hex_area_from_short_diagonal(short_diagonal):
@@ -142,7 +142,7 @@ def get_hex_area_from_short_diagonal(short_diagonal):
     return 1.5 * sqrt(3) * pow(short_diagonal / sqrt(3), 2)
 
 
-def get_hex_area(block_group_feature_class):
+def get_hex_area_from_feature_extents(block_group_feature_class):
     """
     Get the hexagon area using the winsorized width and height values from the spatial extents of the input block
     group polygons.
@@ -173,7 +173,7 @@ def get_hexbins_full_extent(block_groups, output_hexbin_feature_class):
         Output_Feature_Class=output_hexbin_feature_class,
         Extent=describe.extent,                             # get the extent from the describe object
         Shape_Type='HEXAGON',
-        Size=get_hex_area(block_groups),                    # using the logic above to get the hexagon area
+        Size=get_hex_area_from_feature_extents(block_groups),  # using the logic above to get the hexagon area
         Spatial_Reference=describe.spatialReference         # use the same spatial reference as the input block groups
     )[0]
 
@@ -216,6 +216,10 @@ def get_hexbins_by_cbsa(layer_with_cbsa_selected, output_hexbin_feature_class):
     :param output_hexbin_feature_class: Path to where hexbin feature class will be stored.
     :return: Feature class of hexbins covering the area of interest.
     """
+    # ensure only one CBSA is selected or provided as input
+    if int(arcpy.GetCount_management(layer_with_cbsa_selected)[0]) > 1:
+        raise Exception('Only one polygon CBSA can be provided as input. Please select only one CBSA and try again.')
+
     # get the data path to where the Business Analyst data is located
     block_group_feature_class = os.path.join(get_usa_data_path(), r'Data\Demographic Data\esri_bg.bds')
 
