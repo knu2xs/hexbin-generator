@@ -1,5 +1,5 @@
 import arcpy
-
+from hexbin_generator import get_hexbins_from_block_groups
 
 class HexbinTools(object):
     def __init__(self):
@@ -12,16 +12,32 @@ class HexbinTools(object):
         self.tools = [Tool]
 
 
-class Tool(object):
+class GetHexbinsForCbsa(object):
     def __init__(self):
         """Define the tool (tool name is the name of the class)."""
-        self.label = "Tool"
-        self.description = ""
-        self.canRunInBackground = False
+        self.label = "Get Hexbins for CBSA"
+        self.description = "Get hexbins covering the area of a CBSA"
+        self.canRunInBackground = True
 
     def getParameterInfo(self):
         """Define parameter definitions"""
-        params = None
+        param0 = arcpy.Parameter(
+            name='cbsaLayer',
+            displayName='Layer with CBSA Selected',
+            direction='INPUT',
+            datatype='GPFeatureLayer',
+            parameterType='REQUIRED',
+            enabled=True
+        )
+        param1 = arcpy.Parameter(
+            name='outFeatureClass',
+            displayName='Output Hexbin Feature Class',
+            direction='OUTPUT',
+            datatype='DEFeatureClass',
+            parameterType='REQUIRED',
+            enabled=True
+        )
+        params = [param0, param1]
         return params
 
     def isLicensed(self):
@@ -41,4 +57,5 @@ class Tool(object):
 
     def execute(self, parameters, messages):
         """The source code of the tool."""
+        get_hexbins_from_block_groups(parameters[0].valueAsText, parameters[1].valueAsText)
         return
